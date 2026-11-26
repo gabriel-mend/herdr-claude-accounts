@@ -9,6 +9,8 @@ A Herdr.app sidebar mod to **switch between Claude accounts**. Each account is a
 - Hover a row for **new agent** (opens a Claude agent in that account), **sign out** and **remove**. **sign in** is always visible on accounts that are signed out.
 - **sign out** and **remove** ask to confirm. Remove signs the profile out and forgets it; the folder stays on disk. The main profile can't be removed.
 
+The chevron in the header **minimizes** the section to just its title, and expands it back to its previous height. It resizes the mod's own layout block, so the block needs `"min": 42`.
+
 ## The Claude mods
 
 Each one works on its own; together they share the account list.
@@ -52,9 +54,9 @@ PY
 Then add the blocks to a personal layout. Shipped layouts are read-only, so clone one first (`layout.clone`; run `herdr-app commands` for its arguments). Put these inside the sidebar column of your file in `~/.config/herdr-app/layouts/`:
 
 ```json
-{ "id": "claude-context",    "type": "block", "size": { "weight": 1 }, "min": 90, "content": { "mod": "claude-context" } },
-{ "id": "claude-accounts",   "type": "block", "size": { "px": 150 },  "min": 60, "content": { "mod": "claude-accounts" } },
-{ "id": "claude-plan-usage", "type": "block", "size": { "px": 96 },   "min": 60, "content": { "mod": "claude-plan-usage" } }
+{ "id": "claude-context",    "type": "block", "size": { "weight": 1 }, "min": 42, "content": { "mod": "claude-context" } },
+{ "id": "claude-accounts",   "type": "block", "size": { "px": 150 },  "min": 42, "content": { "mod": "claude-accounts" } },
+{ "id": "claude-plan-usage", "type": "block", "size": { "px": 96 },   "min": 42, "content": { "mod": "claude-plan-usage" } }
 ```
 
 Switch to it with `herdr-app do layout.switch --name <your-layout>`. Changing to a layout without these blocks hides the mods.
@@ -69,7 +71,7 @@ herdr-app check ~/.config/herdr-app/mods/claude-accounts
 Add it as a block in a personal layout:
 
 ```json
-{ "id": "claude-accounts", "type": "block", "size": { "px": 150 }, "min": 60, "content": { "mod": "claude-accounts" } }
+{ "id": "claude-accounts", "type": "block", "size": { "px": 150 }, "min": 42, "content": { "mod": "claude-accounts" } }
 ```
 
 ## Active account in the top bar (optional)

@@ -1,6 +1,19 @@
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
-import { exec, theme, appHome, checking, run, props } from "herdr";
+import { exec, theme, appHome, checking, run, props, layout, shared, setShared } from "herdr";
+
+// Minimizing shrinks this mod's own layout block down to its header.
+const MOD = "claude-accounts";
+const MINIMIZED = 42; // header height plus the top border
+function ownBlock(node) {
+  if (node?.content?.mod === MOD && !node.content.props?.badge) return node;
+  for (const child of node?.children ?? []) {
+    const found = ownBlock(child);
+    if (found) return found;
+  }
+  return null;
+}
+const isMinimized = (block) => block?.size?.px != null && block.size.px <= MINIMIZED;
 
 export default class ClaudeAccounts extends View {
   init(_props, cx) {
@@ -120,12 +133,37 @@ export default class ClaudeAccounts extends View {
     return v_flex().size_full().min_h(0)
       .child(h_flex().px(16).pr(10).h(41).pt(14).pb(5).flex_none().items_center().justify_between()
         .child(div().text_size(11.5).font_medium().text_color(t.dim).child("Accounts"))
+        .child(h_flex().items_center()
         .child(div().id("a-add").size(26).flex_none().flex().items_center().justify_center().rounded(6)
-          .text_color(t.dim).cursor_pointer().hover((st) => st.bg(t.hover).text_color(t.foreground))
-          .tooltip("Add account")
-          .on_click((_e, cx) => this.acct(["add"], cx, (a) => this.launch(a, true)))
-          .child(svg("mods/workspace-chrome/plus.svg").size(14))))
-      .child(v_flex().id("a-list").flex_1().min_h(0).px(8).gap(2).overflow_y_scrollbar().children(this.accounts.map(row)));
+            .text_color(t.dim).cursor_pointer().hover((st) => st.bg(t.hover).text_color(t.foreground))
+            .tooltip("Add account")
+            .on_click((_e, cx) => this.acct(["add"], cx, (a) => this.launch(a, true)))
+            .child(svg("mods/workspace-chrome/plus.svg").size(14)))
+          .child(this.minimizeButton(t))))
+      .when(!isMinimized(ownBlock(layout())), (el) => el.child(v_flex().id("a-list").flex_1().min_h(0).px(8).gap(2).overflow_y_scrollbar().children(this.accounts.map(row))));
+  }
+
+  toggleMinimized(cx) {
+    const block = ownBlock(layout());
+    if (!block) return;
+    if (isMinimized(block)) {
+      run("layout.resize", { id: block.id, ...(shared(MOD + ".size") ?? { px: 150 }) });
+    } else {
+      setShared(MOD + ".size", block.size);
+      run("layout.resize", { id: block.id, px: MINIMIZED });
+    }
+    cx.notify();
+  }
+
+  // Chevron in the header; absent when the mod isn't a layout block (e.g. opened as an overlay).
+  minimizeButton(t) {
+    const block = ownBlock(layout());
+    const min = isMinimized(block);
+    return div().when(!!block, (el) => el.child(div().id("minimize").size(26).flex_none().flex().items_center().justify_center().rounded(6)
+      .text_color(t.dim).cursor_pointer().hover((st) => st.bg(t.hover).text_color(t.foreground))
+      .tooltip(min ? "Expand" : "Minimize")
+      .on_click((_e, cx) => this.toggleMinimized(cx))
+      .child(svg(`mods/workspace-chrome/chevron-${min ? "right" : "down"}.svg`).size(14))));
   }
 
   render(cx) {
@@ -133,6 +171,6 @@ export default class ClaudeAccounts extends View {
     if (props()?.badge) return this.badgeView(t);
     return v_flex().size_full().min_h(0).bg(t.chrome).border_t(1).border_color(t.border).text_size(13)
       .child(div().flex_1().min_h(0).child(this.accountsView(t, cx)))
-      .when(this.error, (el) => el.child(div().px(16).py(4).text_size(11).text_color(t.working).child(this.error)));
+      .when(this.error && !isMinimized(ownBlock(layout())), (el) => el.child(div().px(16).py(4).text_size(11).text_color(t.working).child(this.error)));
   }
 }
