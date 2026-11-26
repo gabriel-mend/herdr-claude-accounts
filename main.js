@@ -1,6 +1,6 @@
 import { View, div } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
-import { exec, theme, appHome, checking, run } from "herdr";
+import { exec, theme, appHome, checking, run, props } from "herdr";
 
 export default class ClaudeAccounts extends View {
   init(_props, cx) {
@@ -48,15 +48,25 @@ export default class ClaudeAccounts extends View {
     run("tab.new", { name: a.name, argv: ["env", `CLAUDE_CONFIG_DIR=${a.dir}`, "sh", "-lc", cmd] });
   }
 
-  accountsView(t, cx) {
+  // Colored circle with the account's initial.
+  avatar(a, size) {
     const PALETTE = ["#6366f1", "#14b8a6", "#f59e0b", "#ec4899", "#22c55e", "#0ea5e9", "#a855f7", "#ef4444"];
-    const avatar = (a) => {
-      const label = (a.display || a.email || a.name || "?").trim();
-      let h = 0;
-      for (const ch of a.id) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
-      return h_flex().w(26).h(26).rounded(13).bg(PALETTE[h % PALETTE.length]).items_center().justify_center()
-        .child(div().text_size(12).font_semibold().text_color("#ffffff").child(label[0].toUpperCase()));
-    };
+    const label = (a.display || a.email || a.name || "?").trim();
+    let h = 0;
+    for (const ch of a.id) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    return h_flex().w(size).h(size).flex_none().rounded(size / 2).bg(PALETTE[h % PALETTE.length]).items_center().justify_center()
+      .child(div().text_size(size < 22 ? 10 : 12).font_semibold().text_color("#ffffff").child(label[0].toUpperCase()));
+  }
+
+  // Compact "active account" indicator, for the top bar (block props: { "badge": true }).
+  badgeView(t) {
+    const a = this.accounts.find((x) => x.id === this.active);
+    return h_flex().size_full().px(12).gap(6).items_center().justify_end().bg(t.chrome).border_b(1).border_color(t.border)
+      .when(!!a, (el) => el.child(this.avatar(a, 18))
+        .child(div().min_w(0).truncate().text_size(12).text_color(t.muted).child(a.email || `${a.name} · not signed in`)));
+  }
+
+  accountsView(t, cx) {
     const btn = (id, label, color, onClick) =>
       div().id(id).text_size(11).px(6).py(1).rounded(4).border(1).border_color(t.border)
         .text_color(color).cursor_pointer().hover((st) => st.bg(t.hover)).on_click(onClick).child(label);
@@ -70,7 +80,7 @@ export default class ClaudeAccounts extends View {
         .child(div().id(`a-${a.id}`).cursor_pointer().flex_1().min_w(0)
           .on_click((_e, cx) => { this.active = a.id; cx.notify(); this.acct(["set-active", a.id], cx); })
           .child(h_flex().gap(8).items_center()
-            .child(avatar(a))
+            .child(this.avatar(a, 26))
             .child(v_flex().min_w(0)
               .child(h_flex().gap(5).items_center()
                 .child(div().text_color(on ? t.foreground : t.muted).truncate().child(a.name))
@@ -109,6 +119,7 @@ export default class ClaudeAccounts extends View {
 
   render(cx) {
     const t = theme();
+    if (props()?.badge) return this.badgeView(t);
     return v_flex().size_full().text_size(13).child(this.accountsView(t, cx))
       .when(this.error, (el) => el.child(div().text_size(11).text_color(t.working).px(12).child(this.error)));
   }

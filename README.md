@@ -69,6 +69,19 @@ Add it as a block in a personal layout:
 { "id": "claude-accounts", "type": "block", "size": { "px": 150 }, "min": 60, "content": { "mod": "claude-accounts" } }
 ```
 
+## Active account in the top bar (optional)
+
+The same mod can show the active account (avatar and email) next to the tabs: add a second block with `"props": { "badge": true }`. In your personal layout, replace the `tabs` block with a row that holds both (keep your own `tabs` settings and move its `size` to the row):
+
+```json
+{ "id": "topbar", "type": "row", "size": { "px": 42 }, "resizable": false, "children": [
+  { "id": "tabs", "type": "block", "content": { "mod": "tabs" }, "size": { "weight": 1 }, "window_drag": true },
+  { "id": "active-account", "type": "block", "content": { "mod": "claude-accounts", "props": { "badge": true } }, "size": { "px": 240 }, "window_drag": true }
+] }
+```
+
+It shows the account selected in this mod; agents already running keep the account they started with.
+
 ## Notes
 
 - Profiles are stored in `~/.claude/state/herdr-accounts.json`; [herdr-claude-context](https://github.com/gabriel-mend/herdr-claude-context) and [herdr-claude-plan-usage](https://github.com/gabriel-mend/herdr-claude-plan-usage) read it.
