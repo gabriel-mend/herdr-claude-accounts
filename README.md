@@ -1,6 +1,6 @@
 # herdr-claude-accounts
 
-A [Herdr.app](https://herdr.app) sidebar mod to **switch between Claude accounts**. Each account is a separate profile folder (`CLAUDE_CONFIG_DIR`).
+A Herdr.app sidebar mod to **switch between Claude accounts**. Each account is a separate profile folder (`CLAUDE_CONFIG_DIR`).
 
 - Initial avatar, name and email per account; the active one has a green dot.
 - **new agent** opens a Claude agent in that account; **sign in** / **+ add account** start `claude auth login` first.
