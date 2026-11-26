@@ -4,9 +4,10 @@
 
 A Herdr.app sidebar mod to **switch between Claude accounts**. Each account is a separate profile folder (`CLAUDE_CONFIG_DIR`).
 
-- Initial avatar, name and email per account; the active one has a green dot.
-- **new agent** opens a Claude agent in that account; **sign in** / **+ add account** start `claude auth login` first.
-- **sign out** and **remove** (both ask to confirm). Remove signs the profile out and forgets it; the folder stays on disk. The main profile can't be removed.
+- One row per account, styled like Herdr's Spaces list: square initial avatar and email; the active account is highlighted. Click a row to make it active.
+- The **+** in the header adds an account and starts `claude auth login`.
+- Hover a row for **new agent** (opens a Claude agent in that account), **sign out** and **remove**. **sign in** is always visible on accounts that are signed out.
+- **sign out** and **remove** ask to confirm. Remove signs the profile out and forgets it; the folder stays on disk. The main profile can't be removed.
 
 ## The Claude mods
 
@@ -53,7 +54,7 @@ Then add the blocks to a personal layout. Shipped layouts are read-only, so clon
 ```json
 { "id": "claude-context",    "type": "block", "size": { "weight": 1 }, "min": 90, "content": { "mod": "claude-context" } },
 { "id": "claude-accounts",   "type": "block", "size": { "px": 150 },  "min": 60, "content": { "mod": "claude-accounts" } },
-{ "id": "claude-plan-usage", "type": "block", "size": { "px": 78 },   "min": 60, "content": { "mod": "claude-plan-usage" } }
+{ "id": "claude-plan-usage", "type": "block", "size": { "px": 96 },   "min": 60, "content": { "mod": "claude-plan-usage" } }
 ```
 
 Switch to it with `herdr-app do layout.switch --name <your-layout>`. Changing to a layout without these blocks hides the mods.
@@ -89,6 +90,17 @@ It shows the account selected in this mod; agents already running keep the accou
 - Profiles are stored in `~/.claude/state/herdr-accounts.json`; [herdr-claude-context](https://github.com/gabriel-mend/herdr-claude-context) and [herdr-claude-plan-usage](https://github.com/gabriel-mend/herdr-claude-plan-usage) read it.
 - New profiles start empty (no history, `CLAUDE.md`, MCP servers or skills of the main profile) and get the plan-usage `statusLine` automatically.
 - Agents started in a plain terminal use the main profile. Signing out of the main account breaks its already-open agents.
+
+## Tests
+
+No dependencies to install: Python 3 (`unittest`) and Node 20.6+ (`node --test`). From the repository folder:
+
+```sh
+python3 -m unittest discover -s tests
+node --test tests/mod.test.mjs
+```
+
+The Node tests load `main.js` with fake Herdr modules (`tests/stubs.mjs`) and check what is shown and what each click does. They don't test how it looks; for that, run `herdr-app check` and look at the app. The account tests use a temporary `HOME` and a fake `claude`, so your real accounts are never touched.
 
 ## Author
 
