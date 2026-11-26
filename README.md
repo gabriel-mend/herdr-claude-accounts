@@ -1,3 +1,5 @@
+<p align="center"><img src="logo.svg" width="120" alt="herdr-claude-accounts logo"></p>
+
 # herdr-claude-accounts
 
 A Herdr.app sidebar mod to **switch between Claude accounts**. Each account is a separate profile folder (`CLAUDE_CONFIG_DIR`).
