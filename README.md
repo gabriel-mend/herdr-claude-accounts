@@ -90,6 +90,12 @@ It shows the account selected in this mod; agents already running keep the accou
 - New profiles start empty (no history, `CLAUDE.md`, MCP servers or skills of the main profile) and get the plan-usage `statusLine` automatically.
 - Agents started in a plain terminal use the main profile. Signing out of the main account breaks its already-open agents.
 
+## Author
+
+<a href="https://www.linkedin.com/in/gabriel-mendonca-pereira/"><img src="https://github.com/gabriel-mend.png?size=200" width="100" alt="Gabriel Mendonça Pereira on LinkedIn"></a>
+
+**[Gabriel Mendonça Pereira](https://www.linkedin.com/in/gabriel-mendonca-pereira/)**
+
 ## License
 
 [MIT](LICENSE) © 2026 [Gabriel Mendonça Pereira](https://github.com/gabriel-mend) · [LinkedIn](https://www.linkedin.com/in/gabriel-mendonca-pereira/)
